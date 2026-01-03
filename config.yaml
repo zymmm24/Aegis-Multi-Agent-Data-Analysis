@@ -1,0 +1,180 @@
+# =============================================================================
+# Aegis: 多Agent协同自适应结构化数据分析系统 - 全局配置
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# L1: 自适应数据预处理层配置
+# -----------------------------------------------------------------------------
+l1_etl:
+  # 分块处理设置
+  chunk_rows: 10000              # 每个chunk的最大行数
+  sniff_bytes: 65536             # 用于格式检测的采样字节数
+  
+  # 表头检测设置
+  max_header_scan: 8             # 最多扫描前N行作为表头候选
+  header_lookahead: 20           # 评估表头时向后看的行数
+  score_gap_threshold: 0.40      # 首行优先的分数差距阈值
+  
+  # 置信度阈值
+  confidence_thresholds:
+    high: 0.75                   # 高置信度阈值
+    medium: 0.50                 # 中等置信度阈值
+    low: 0.30                    # 低置信度阈值
+  
+  # 异常检测设置
+  anomaly_detection:
+    enable_isolation_forest: true
+    isolation_forest_estimators: 100
+    missing_ratio_weight: 0.30   # 缺失值在异常分数中的权重
+
+  # 输出设置
+  output_dir: "ir_output"        # 中间表示输出目录
+
+# -----------------------------------------------------------------------------
+# L2: 双通道领域感知层配置
+# -----------------------------------------------------------------------------
+l2_perception:
+  # 语义通道
+  semantic_channel:
+    enabled: true
+    embedding_model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    similarity_threshold: 0.7
+  
+  # 统计通道  
+  statistical_channel:
+    enabled: true
+    classifier_type: "random_forest"
+  
+  # 融合权重
+  fusion_weights:
+    semantic: 0.6
+    statistical: 0.4
+
+# -----------------------------------------------------------------------------
+# L3: 多Agent协同分析层配置
+# -----------------------------------------------------------------------------
+l3_agents:
+  # 调度设置
+  scheduler:
+    max_concurrent_agents: 4
+    timeout_seconds: 300
+  
+  # 模型降级策略
+  model_degradation:
+    baseline_first: true          # 优先使用基线模型
+    residual_threshold: 0.15      # 残差阈值，超过则升级模型
+    min_samples_for_deep: 1000    # 使用深度模型的最小样本量
+
+# -----------------------------------------------------------------------------
+# L4: 决策仲裁与融合层配置
+# -----------------------------------------------------------------------------
+l4_arbitration:
+  # 冲突消解
+  conflict_resolution:
+    voting_method: "weighted"     # weighted | majority | confidence_based
+    min_agreement_ratio: 0.6
+  
+  # 一致性校验
+  consistency_check:
+    enabled: true
+    strict_mode: false            # 严格模式下任何冲突都标记为NEEDS_REVIEW
+
+# -----------------------------------------------------------------------------
+# L5: 知识合成与报告生成层配置
+# -----------------------------------------------------------------------------
+l5_reporting:
+  # 报告模板
+  template_dir: "templates"
+  default_template: "standard_report.jinja2"
+  
+  # 证据锚点
+  evidence_anchoring:
+    enabled: true
+    citation_format: "[Source: {agent}, Conf: {confidence:.2f}]"
+
+# -----------------------------------------------------------------------------
+# LLM 配置 (用于L2辅助判断和L5报告生成)
+# -----------------------------------------------------------------------------
+llm:
+  # 提供商: ollama | openai | azure | local
+  provider: "ollama"
+  
+  # 是否在低置信度时自动调用LLM
+  auto_review_on_low_confidence: true
+  
+  # Ollama 配置 (本地部署)
+  ollama:
+    base_url: "http://localhost:11434"
+    model: "qwen2.5:7b"
+    timeout: 60
+    temperature: 0.1
+    max_tokens: 1024
+  
+  # OpenAI 配置
+  openai:
+    api_key: "${OPENAI_API_KEY}"    # 从环境变量读取
+    base_url: "https://api.openai.com/v1"
+    model: "gpt-4o-mini"
+    timeout: 30
+    temperature: 0.1
+    max_tokens: 1024
+  
+  # Azure OpenAI 配置
+  azure:
+    api_key: "${AZURE_OPENAI_API_KEY}"
+    endpoint: "${AZURE_OPENAI_ENDPOINT}"
+    deployment_name: "gpt-4o-mini"
+    api_version: "2024-02-15-preview"
+  
+  # 本地模型配置 (如 LM Studio)
+  local:
+    base_url: "http://localhost:1234/v1"
+    model: "local-model"
+    timeout: 120
+
+# -----------------------------------------------------------------------------
+# 领域知识图谱配置
+# -----------------------------------------------------------------------------
+knowledge_graph:
+  # 知识图谱来源
+  source: "builtin"               # builtin | json | yaml | neo4j
+  
+  # 内置领域
+  builtin_domains:
+    - finance
+    - healthcare
+    - ecommerce
+    - timeseries
+    - general
+  
+  # 自定义知识图谱路径
+  custom_kg_path: "knowledge/domain_kg.yaml"
+  
+  # Neo4j 配置 (如果使用外部图数据库)
+  neo4j:
+    uri: "bolt://localhost:7687"
+    user: "neo4j"
+    password: "${NEO4J_PASSWORD}"
+
+# -----------------------------------------------------------------------------
+# 日志配置
+# -----------------------------------------------------------------------------
+logging:
+  level: "INFO"                   # DEBUG | INFO | WARNING | ERROR
+  format: "%(levelname)s:%(name)s:%(message)s"
+  file: null                      # 日志文件路径，null表示只输出到控制台
+  
+# -----------------------------------------------------------------------------
+# 系统设置
+# -----------------------------------------------------------------------------
+system:
+  # 并行处理
+  max_workers: 4
+  
+  # 缓存
+  cache_enabled: true
+  cache_dir: ".cache"
+  
+  # 临时文件
+  temp_dir: ".tmp"
+

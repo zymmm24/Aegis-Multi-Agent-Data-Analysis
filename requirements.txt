@@ -1,0 +1,32 @@
+# =============================================================================
+# Aegis: Multi-Agent Data Analysis System - Dependencies
+# =============================================================================
+
+# Core dependencies (required)
+numpy>=1.21.0
+pandas>=1.3.0
+scipy>=1.7.0
+pyyaml>=6.0
+
+# Optional: Encoding detection
+chardet>=4.0.0
+
+# Optional: Machine Learning (for Isolation Forest anomaly detection)
+scikit-learn>=1.0.0
+
+# Optional: Advanced NLP (for L2 semantic channel)
+# sentence-transformers>=2.2.0
+
+# Optional: HTTP client (for LLM API calls)
+requests>=2.28.0
+
+# Optional: Async HTTP (for concurrent API calls)
+# aiohttp>=3.8.0
+
+# Optional: Knowledge Graph (for L2 visualization)
+networkx>=2.8.0
+pyvis>=0.3.0
+
+# Development dependencies
+# pytest>=7.0.0
+

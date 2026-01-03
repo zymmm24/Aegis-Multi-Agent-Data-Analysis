@@ -1,0 +1,8 @@
+id,timestamp,amount,category,description
+1,2025-01-01 10:00:00,123.45,A,normal entry
+2,2025-01-01 10:05:00,130.00,A,normal entry
+3,2025-01-01 10:10:00,99999999,A,outlier amount
+4,not a date,200.00,B,weird timestamp
+5,2025-01-01 10:20:00,150.00,A,normal entry
+6,,,,
+7,2025-01-01 10:30:00,160.00,C,normal entry
